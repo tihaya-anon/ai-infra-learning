@@ -53,11 +53,17 @@ value, ok := q.TryDequeue()
 
 ## 2. SPSCQueue：用所有权换取简单性
 
-SPSC 环形队列只有两个不断递增的位置：
+SPSC 是 Single Producer, Single Consumer 的缩写。它把并发约束变成所有权约束：
 
 - Producer 独占 `writePos`，写入槽位后发布新的写位置。
 - Consumer 独占 `readPos`，读取槽位后发布新的读位置。
-- 数组下标使用 `position & (capacity - 1)`，因此容量必须是 2 的幂。
+- 双方都可以读取对方的位置，但绝不会写对方的位置。
+
+因此，推进位置不需要 CAS：不存在第二个 Producer 与当前 Producer 竞争 `writePos`，也不存在第二个 Consumer 竞争 `readPos`。原子操作在这里主要负责跨 Goroutine 的可见性，而不是争夺位置的所有权。
+
+### 2.1 逻辑位置与物理下标
+
+`readPos` 和 `writePos` 是不断递增的逻辑位置，不会在走到数组末尾时归零；真正访问数组时，才把逻辑位置映射成有限范围内的物理下标。
 
 ```mermaid
 flowchart LR
@@ -71,11 +77,118 @@ flowchart LR
     Write["writePos = 5"] --> S5
 ```
 
-线性化点是位置的原子 Store：
+例如容量为 8 时，逻辑位置 `8`、`16` 和 `24` 都映射到物理槽位 `0`。保留不断递增的逻辑位置有两个好处：
 
-- 入队先写元素，再 `writePos.Store`，Consumer 看到新位置后才能读取元素。
-- 出队先读取并清空元素，再 `readPos.Store`，Producer 看到新位置后才能复用槽位。
-- Go 的 `sync/atomic` 操作是顺序一致的，提供这里需要的内存可见性。
+- `readPos == writePos` 可以直接表示队列为空。
+- `writePos - readPos == capacity` 可以直接表示队列已满。
+
+如果两个位置都在数组末尾归零，那么 `readPos == writePos` 既可能表示空，也可能表示满，还需要额外的状态位来区分。
+
+代码中的满、空判断分别是：
+
+```go
+// Producer: 已发布但尚未消费的元素数等于容量，队列已满。
+if writePos-q.readPos.Load() == uint64(len(q.slots)) {
+    return false
+}
+
+// Consumer: 没有 Producer 新发布的位置，队列为空。
+if readPos == q.writePos.Load() {
+    return zero, false
+}
+```
+
+位置使用 `uint64`，加减法按模 `2^64` 计算。即使计数器最终溢出，只要 Producer 没有覆盖尚未消费的元素，位置差和下标映射仍能保持一致。实际运行中，每秒十亿次操作也需要数百年才会走完 `uint64` 的范围。
+
+### 2.2 为什么要求容量是 2 的幂
+
+构造函数使用下面的表达式验证容量：
+
+```go
+capacity > 0 && capacity&(capacity-1) == 0
+```
+
+一个正整数如果是 2 的幂，二进制表示中只会有一个 `1`。减去 1 后，原来的最高位变成 `0`，它右侧的位全部变成 `1`，所以两者按位与的结果一定是 0：
+
+```text
+capacity = 8:  1000
+capacity - 1:  0111
+                  &
+               0000  // 是 2 的幂
+
+capacity = 6:  0110
+capacity - 1:  0101
+                  &
+               0100  // 不是 2 的幂
+```
+
+`capacity <= 0` 必须单独判断，因为 `0 & (0 - 1)` 也会得到 0，但容量 0 显然不能创建队列。
+
+### 2.3 为什么用 `position & mask` 代替取模
+
+构造时保存：
+
+```go
+mask := uint64(capacity - 1)
+```
+
+当 `capacity = 8` 时，`mask = 7`，二进制是 `0b111`。表达式 `position & mask` 只保留位置的低 3 位，其结果一定在 `[0, 7]` 范围内。这正好等价于 `position % 8`：
+
+| 逻辑位置 `position` |   二进制 | `position & 0b111` | 物理下标 |
+| ------------------: | -------: | -----------------: | -------: |
+|                   6 |   `0110` |             `0110` |        6 |
+|                   7 |   `0111` |             `0111` |        7 |
+|                   8 |   `1000` |             `0000` |        0 |
+|                   9 |   `1001` |             `0001` |        1 |
+|                  15 |   `1111` |             `0111` |        7 |
+|                  16 | `1 0000` |             `0000` |        0 |
+
+因此源码中的：
+
+```go
+q.slots[writePos&q.mask] = value
+```
+
+等价于：
+
+```go
+q.slots[writePos%uint64(len(q.slots))] = value
+```
+
+位与只适用于容量为 2 的幂。例如容量为 6 时，`mask = 5`，`6 & 5` 得到 4，而 `6 % 6` 应该得到 0。构造函数拒绝容量 3、6 等值，就是为了保证这个映射成立。
+
+这里使用位与有两个目的：明确表达“环形容量是 2 的幂”这一算法约束，以及避免使用运行时除法完成取模。后者是否带来可观收益仍应以 Benchmark 为准，不能仅凭位运算就断言整个队列更快。
+
+### 2.4 Enqueue 的发布顺序
+
+`TryEnqueue` 可以按四步理解：
+
+1. Producer 读取自己独占的 `writePos`。
+2. 读取 Consumer 发布的 `readPos`，检查队列是否已满。
+3. 把元素写入 `slots[writePos & mask]`。
+4. 使用 `writePos.Store(writePos + 1)` 发布元素。
+
+第 3、4 步不能交换。如果先推进 `writePos`，Consumer 可能观察到“已有新元素”，却读到槽位中尚未更新的旧值或零值。成功的 `writePos.Store` 是入队的线性化点：从这一刻开始，该元素在逻辑上已经入队。
+
+### 2.5 Dequeue 的消费顺序
+
+`TryDequeue` 与入队对称：
+
+1. Consumer 读取自己独占的 `readPos`。
+2. 读取 Producer 发布的 `writePos`，检查队列是否为空。
+3. 读取 `slots[readPos & mask]`，并把槽位清成 `T` 的零值。
+4. 使用 `readPos.Store(readPos + 1)` 发布可复用空间。
+
+清零并不是算法判断空、满所必需的；它是为了避免字符串、Slice、指针等引用类型继续被环形数组持有，导致对应对象无法及时被 GC 回收。成功的 `readPos.Store` 是出队的线性化点，也是 Producer 可以安全复用该槽位的信号。
+
+### 2.6 原子操作建立可见性
+
+Go 的 `sync/atomic` 操作是顺序一致的。位置上的原子 Store 和 Load 建立了两条关键的发布关系：
+
+- Producer 先写槽位，再发布 `writePos`；Consumer 观察到新 `writePos` 后读取槽位。
+- Consumer 先读取并清空槽位，再发布 `readPos`；Producer 观察到新 `readPos` 后复用槽位。
+
+虽然 `slots` 本身不是原子变量，但严格的单 Producer/单 Consumer 所有权加上位置的发布顺序，保证双方不会同时读写同一个有效槽位。
 
 ```mermaid
 sequenceDiagram
@@ -95,7 +208,34 @@ sequenceDiagram
     C->>R: atomic Store next position
 ```
 
-限制：同一时间必须恰好只有一个 Producer 和一个 Consumer。这个限制是算法契约，Race Detector 不一定能证明调用者遵守了角色约束。
+### 2.7 为什么位置之间有缓存行填充
+
+`readPos` 主要由 Consumer 写，`writePos` 主要由 Producer 写。如果它们落在同一个 CPU Cache Line 上，那么任何一方写入位置都会使另一颗 CPU Core 上的整条缓存行失效，即使双方修改的是不同变量。这种现象叫 False Sharing。
+
+实现用填充字段拉开两个计数器：
+
+```go
+_        [cacheLineSize]byte
+readPos  atomic.Uint64
+_        [cacheLineSize]byte
+writePos atomic.Uint64
+_        [cacheLineSize]byte
+```
+
+这样做是为了减少热点计数器之间的缓存一致性流量。`64` 是常见 CPU 的 Cache Line 大小，但不是 Go API 提供的跨平台常量，因此这仍是一种面向常见硬件的工程假设，而不是语言层面的保证。
+
+### 2.8 使用边界
+
+- 同一时间必须恰好只有一个 Producer 和一个 Consumer。
+- `TryEnqueue` 在队列满时立即返回 `false`，`TryDequeue` 在队列空时立即返回 `false`；调用者需要决定重试、让出 CPU、等待通知还是丢弃数据。
+- `Len` 是瞬时观测值，返回后可能立即过期，不能用它代替一次真正的入队或出队尝试。
+- 队列创建后不能复制，否则会复制原子位置和 Slice Header，破坏单一状态的假设。
+- Race Detector 可以发现实际发生的数据竞争，但不一定能证明调用者始终遵守 SPSC 角色约束。
+
+相关资料：
+
+- [The Go Memory Model](https://go.dev/ref/mem)
+- [Package sync/atomic](https://pkg.go.dev/sync/atomic)
 
 ## 3. LockFreeQueue：Michael-Scott MPMC 队列
 
