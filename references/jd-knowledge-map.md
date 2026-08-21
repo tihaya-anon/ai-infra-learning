@@ -22,6 +22,13 @@
 - 能用指标和工具定位瓶颈，而不是凭感觉调参。
 - 能实现一个最小系统，并通过测试或基准数据证明效果。
 
+### 学习资料
+
+- [Kubernetes Concepts](https://kubernetes.io/docs/concepts/)：岗位云原生基础的官方总入口。
+- [NVIDIA Cloud Native Technologies](https://docs.nvidia.com/datacenter/cloud-native/)：GPU、容器和 Kubernetes 软件栈概览。
+- [CNCF Cloud Native Landscape](https://landscape.cncf.io/)：定位调度、存储、网络和可观测项目的生态地图。
+- [Google SRE Book](https://sre.google/sre-book/table-of-contents/)：生产系统可靠性和工程方法的整体框架。
+
 ## 2. 计算机基础与编程能力
 
 ### 2.1 数据结构与算法
@@ -87,6 +94,17 @@
 - **Java**：大型工程平台和服务端生态；理解 JVM 资源模型有助于排查混部问题。
 - **Shell**：进程、网络、磁盘和容器问题的快速诊断；避免脆弱的生产脚本。
 
+### 学习资料
+
+- [MIT 6.006 Introduction to Algorithms](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/)：课程视频、讲义、习题和考试。
+- [Go 官方文档](https://go.dev/doc/)：语言规范、教程和工具文档总入口。
+- [A Tour of Go](https://go.dev/tour/)：语法、接口、泛型和并发基础。
+- [Effective Go](https://go.dev/doc/effective_go)：命名、接口、错误处理和并发惯用法。
+- [The Go Memory Model](https://go.dev/ref/mem)：happens-before、Channel、锁和原子操作。
+- [Go Diagnostics](https://go.dev/doc/diagnostics)：pprof、trace 和运行时诊断入口。
+- [Data Race Detector](https://go.dev/doc/articles/race_detector)：竞态检测方法、限制和案例。
+- [Profiling Go Programs](https://go.dev/blog/pprof)：使用 pprof 分析 CPU 和内存瓶颈。
+
 ## 3. Linux 系统基础
 
 ### 3.1 进程、线程与调度
@@ -133,6 +151,18 @@
 - 性能：`perf`、FlameGraph、`bpftrace`、BCC 和 libbpf。
 - 硬件：`numactl`、`lscpu`、`nvidia-smi`、DCGM 和 PCIe 拓扑工具。
 
+### 学习资料
+
+- [Linux Kernel Administrator's Guide](https://www.kernel.org/doc/html/latest/admin-guide/index.html)：内核管理文档总入口。
+- [Control Group v2](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html)：cgroup v2 设计和控制器接口。
+- [Linux namespaces 手册](https://man7.org/linux/man-pages/man7/namespaces.7.html)：Namespace 关系、生命周期和 API。
+- [Linux Memory Management](https://www.kernel.org/doc/html/latest/mm/index.html)：页表、分配器、回收和 NUMA。
+- [Linux Networking](https://www.kernel.org/doc/html/latest/networking/index.html)：内核网络栈、驱动和 XDP。
+- [Linux Filesystems](https://www.kernel.org/doc/html/latest/filesystems/index.html)：VFS、OverlayFS、ext4 等机制。
+- [perf Wiki](https://perf.wiki.kernel.org/index.php/Main_Page)：perf 事件、采样和分析资料。
+- [BPF Documentation](https://docs.kernel.org/bpf/index.html)：Verifier、程序类型、BTF 和 CO-RE。
+- [Brendan Gregg Linux Performance](https://www.brendangregg.com/linuxperf.html)：Linux 性能工具和 USE 方法图谱。
+
 ## 4. 容器原理与运行时
 
 ### 4.1 容器隔离机制
@@ -172,6 +202,20 @@
 - 跟踪一次 Pod 创建，从 API 请求定位到容器主进程。
 - 对镜像拉取和容器启动链路分段打点，找出冷启动主导因素。
 
+### 学习资料
+
+- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)：容器配置、状态和生命周期规范。
+- [OCI Image Specification](https://github.com/opencontainers/image-spec)：Manifest、Config、Layer 和 Image Index。
+- [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec)：OCI 内容分发协议。
+- [runc](https://github.com/opencontainers/runc)：OCI Runtime Spec 的参考实现。
+- [containerd Architecture](https://github.com/containerd/containerd/blob/main/docs/historical/design/architecture.md)：containerd 子系统设计。
+- [containerd Runtime v2](https://github.com/containerd/containerd/blob/main/docs/runtime-v2.md)：containerd、shim 和 runc 的交互。
+- [containerd CRI Architecture](https://github.com/containerd/containerd/blob/main/docs/cri/architecture.md)：kubelet、CRI、CNI 和 Sandbox 链路。
+- [Kubernetes CRI](https://kubernetes.io/docs/concepts/containers/cri/)：Kubernetes 容器运行时接口。
+- [Kata Containers Architecture](https://github.com/kata-containers/kata-containers/blob/main/docs/design/architecture/README.md)：轻量虚拟机容器架构。
+- [gVisor Architecture Guide](https://gvisor.dev/docs/architecture_guide/intro/)：用户态内核和系统调用拦截。
+- [Firecracker Design](https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md)：MicroVM 设备、启动和安全设计。
+
 ## 5. Kubernetes 架构与核心机制
 
 ### 5.1 控制面
@@ -208,6 +252,20 @@
 - 从零实现一个带 CRD、Controller、Webhook、状态机和故障恢复测试的 Operator。
 - 能说明删除一个带 Finalizer 的自定义资源时，每一步发生了什么。
 - 能通过审计日志、事件、组件日志和指标定位 Pod 长时间 Pending 的根因。
+
+### 学习资料
+
+- [Kubernetes Concepts](https://kubernetes.io/docs/concepts/)：官方概念文档总入口。
+- [Cluster Architecture](https://kubernetes.io/docs/concepts/architecture/)：控制面和节点组件。
+- [Controllers](https://kubernetes.io/docs/concepts/architecture/controller/)：控制循环与期望状态。
+- [Kubernetes API Concepts](https://kubernetes.io/docs/reference/using-api/api-concepts/)：resourceVersion、Watch、并发和 Patch。
+- [Custom Resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)：CRD、自定义 Controller 和 API Aggregation。
+- [Operator Pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)：用 CRD 与控制器封装运维知识。
+- [client-go](https://github.com/kubernetes/client-go)：官方 Go 客户端源码。
+- [sample-controller](https://github.com/kubernetes/sample-controller)：使用 client-go 编写 Controller 的官方示例。
+- [controller-runtime FAQ](https://github.com/kubernetes-sigs/controller-runtime/blob/main/FAQ.md)：Reconcile、Cache 和 Client 常见问题。
+- [etcd API Guarantees](https://etcd.io/docs/v3.7/learning/api_guarantees/)：一致性、事务与 Watch 保证。
+- [Operating etcd for Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/)：etcd 备份、恢复和运维。
 
 ## 6. AI 容器调度
 
@@ -257,6 +315,20 @@
 - 用可重复的集群负载比较默认调度器与自定义策略的排队时间和利用率。
 - 能解释抢占如何产生级联影响，以及如何避免低优先级任务长期饥饿。
 
+### 学习资料
+
+- [Kubernetes Scheduler](https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/)：默认调度器职责和选择流程。
+- [Scheduling Framework](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduling-framework/)：调度周期、绑定周期和插件扩展点。
+- [Scheduler Configuration](https://kubernetes.io/docs/reference/scheduling/config/)：调度 Profile 和插件配置。
+- [Resource Bin Packing](https://kubernetes.io/docs/concepts/scheduling-eviction/resource-bin-packing/)：资源装箱打分。
+- [Topology-Aware Workload Scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-aware-scheduling/)：PodGroup 与拓扑域协同放置。
+- [Volcano Scheduler Overview](https://volcano.sh/docs/scheduler/overview/)：Gang、DRF、Binpack 和 Priority 插件。
+- [Volcano Queue](https://volcano.sh/docs/concepts/queue/)：队列、保证资源、权重和回收。
+- [Kueue Concepts](https://kueue.sigs.k8s.io/docs/concepts/)：ClusterQueue、Cohort、Flavor 和 Admission Check。
+- [Kueue Fair Sharing](https://kueue.sigs.k8s.io/docs/concepts/fair_sharing/)：队列公平共享和资源借用。
+- [JobSet](https://jobset.sigs.k8s.io/docs/overview/)：分布式 AI/HPC 作业编排 API。
+- [Kubeflow Trainer](https://www.kubeflow.org/docs/components/trainer/)：分布式训练作业管理。
+
 ## 7. AI 训练与推理工作负载
 
 ### 7.1 GPU 与模型计算基础
@@ -292,6 +364,36 @@
 - 冷启动组成：镜像、模型、依赖、代码、沙箱、网络和缓存。
 - Agent 池化、Warm Pool、预创建 Pod、预拉镜像和模型预热。
 - 会话状态、检查点、任务幂等、超时、取消和重试。
+
+### 学习资料
+
+#### GPU 与分布式训练
+
+- [CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/contents.html)：Kernel、内存、Stream 和多 GPU 编程。
+- [NVIDIA MIG User Guide](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/)：MIG 的隔离与实例管理。
+- [Kubernetes Device Plugins](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/)：设备发现、注册和分配接口。
+- [NVIDIA Kubernetes Device Plugin](https://github.com/NVIDIA/k8s-device-plugin)：GPU、MIG、Time-Slicing 和 MPS 集成。
+- [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)：GPU 软件栈自动化管理。
+- [Kubernetes Topology Manager](https://kubernetes.io/docs/tasks/administer-cluster/topology-manager/)：CPU、内存和设备 NUMA 对齐。
+- [PyTorch Distributed Overview](https://docs.pytorch.org/tutorials/beginner/dist_overview.html)：DDP、FSDP、TP 和 DeviceMesh 的选择。
+- [PyTorch Distributed Tutorials](https://docs.pytorch.org/tutorials/distributed.html)：官方分布式训练教程集合。
+- [DistributedDataParallel](https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html)：DDP 同步与进程模型。
+- [FullyShardedDataParallel](https://docs.pytorch.org/docs/stable/fsdp.html)：参数、梯度和优化器状态分片。
+- [PyTorch Elastic](https://docs.pytorch.org/docs/stable/distributed.elastic.html)：Rendezvous、容错和弹性启动。
+- [NCCL User Guide](https://docs.nvidia.com/deeplearning/nccl/user-guide/index.html)：集合通信、拓扑和故障排查。
+- [NCCL Tests](https://github.com/NVIDIA/nccl-tests)：集合通信正确性和性能测试。
+- [Megatron-LM](https://github.com/NVIDIA/Megatron-LM)：多维并行的工程实现。
+- [DeepSpeed ZeRO](https://www.deepspeed.ai/tutorials/zero/)：ZeRO 状态分片和内存优化。
+
+#### 推理与 Agent
+
+- [vLLM Documentation](https://docs.vllm.ai/en/stable/)：PagedAttention、高吞吐 Serving 和分布式推理。
+- [vLLM Architecture Overview](https://docs.vllm.ai/en/latest/design/arch_overview/)：Engine、Worker 和 Model Runner 架构。
+- [vLLM Optimization and Tuning](https://docs.vllm.ai/en/latest/configuration/optimization/)：KV Cache、批处理、并发和显存调优。
+- [NVIDIA Triton Inference Server](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/)：Dynamic Batching、调度和指标。
+- [TensorRT-LLM Architecture](https://nvidia.github.io/TensorRT-LLM/architecture/overview.html)：推理 Runtime 和并行策略。
+- [OpenAI Agents SDK: Agents](https://openai.github.io/openai-agents-python/agents/)：Agent、Runner、Tool 和 Guardrail。
+- [OpenAI Agents SDK: Testing](https://openai.github.io/openai-agents-python/testing/)：Agent 编排和工具的确定性测试。
 
 ## 8. AI 高性能存储
 
@@ -333,6 +435,19 @@
 - 实现一个分片并行、异步上传且可原子恢复的最小 Checkpoint 流程。
 - 使用 eBPF/perf/存储指标判断瓶颈在应用、VFS、块设备还是网络。
 
+### 学习资料
+
+- [Kubernetes Storage](https://kubernetes.io/docs/concepts/storage/)：Volume、PV、PVC、StorageClass 和 Snapshot 总入口。
+- [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)：PV/PVC 生命周期与访问模式。
+- [Storage Classes](https://kubernetes.io/docs/concepts/storage/storage-classes/)：动态供应和拓扑绑定。
+- [CSI Specification](https://github.com/container-storage-interface/spec)：CSI Identity、Controller 和 Node Service 协议。
+- [CSI Developer Documentation](https://kubernetes-csi.github.io/docs/)：Sidecar、部署、Snapshot 和驱动开发。
+- [PyTorch Distributed Checkpoint](https://docs.pytorch.org/docs/stable/distributed.checkpoint.html)：分布式状态的并行保存和加载。
+- [PyTorch Asynchronous Checkpointing](https://docs.pytorch.org/tutorials/recipes/distributed_async_checkpoint_recipe.html)：降低保存对训练循环的阻塞。
+- [PyTorch DataLoader](https://docs.pytorch.org/docs/stable/data.html)：多进程读取、Pinned Memory 和 Prefetch。
+- [NVIDIA GPUDirect Storage](https://docs.nvidia.com/gpudirect-storage/index.html)：GPU 与存储之间直接 DMA。
+- [GPUDirect Storage Design Guide](https://docs.nvidia.com/gpudirect-storage/design-guide/index.html)：GDS 数据路径与拓扑设计。
+
 ## 9. AI 高性能网络
 
 ### 9.1 Kubernetes 网络模型
@@ -372,6 +487,20 @@
 - 使用 `iperf3`、`qperf`、`ib_write_bw`、NCCL Tests 建立分层基准。
 - 能区分应用延迟、容器网络开销、TCP/RDMA 问题和物理链路问题。
 
+### 学习资料
+
+- [Kubernetes Networking](https://kubernetes.io/docs/concepts/services-networking/)：Service、EndpointSlice、Gateway 和 NetworkPolicy。
+- [CNI Specification](https://github.com/containernetworking/cni/blob/main/SPEC.md)：Runtime 调用网络插件的标准接口。
+- [Cilium Architecture](https://docs.cilium.io/en/stable/overview/component-overview/)：基于 eBPF 的容器网络和 Service。
+- [Cilium kube-proxy replacement](https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/)：eBPF Service 转发路径。
+- [Multus CNI](https://k8snetworkplumbingwg.github.io/multus-cni/docs/quickstart.html)：为 Pod 附加多张网卡。
+- [SR-IOV Network Device Plugin](https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin)：发现和分配 VF 资源。
+- [RDMA CNI](https://github.com/k8snetworkplumbingwg/rdma-cni)：将 RDMA 设备放入 Pod Network Namespace。
+- [RDMA Aware Networks Programming](https://docs.nvidia.com/rdma-aware-networks-programming-user-manual-1-7.pdf)：Verbs、QP、CQ、MR 和 RDMA CM。
+- [NVIDIA RoCE Documentation](https://docs.nvidia.com/networking/display/nvidiamlnxofeddocumentationv24101140105lts/rdma%2Bover%2Bconverged%2Bethernet%2B%28roce%29)：RoCEv1/v2、GID 和 PFC。
+- [NCCL GPU Troubleshooting](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/gpu_troubleshooting.html)：PCIe、NVLink、ACS 和容器拓扑发现。
+- [GPUDirect RDMA](https://docs.nvidia.com/cuda/gpudirect-rdma/)：GPU 显存与第三方 PCIe 设备之间的 DMA。
+
 ## 10. 弹性调度与冷启动优化
 
 ### 10.1 弹性伸缩基础
@@ -403,6 +532,19 @@
 - 实现一个基于队列长度和预测负载的弹性控制器。
 - 验证突发流量、预测错误、节点故障和缓存未命中时的系统行为。
 
+### 学习资料
+
+- [Kubernetes Autoscaling Workloads](https://kubernetes.io/docs/concepts/workloads/autoscaling/)：HPA、VPA 和工作负载伸缩总览。
+- [Horizontal Pod Autoscaling](https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/)：算法、指标和稳定窗口。
+- [Node Autoscaling](https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/)：节点供给与调度约束。
+- [KEDA Concepts](https://keda.sh/docs/latest/concepts/)：事件驱动伸缩和 Scale-to-Zero。
+- [Knative Serving Autoscaling](https://knative.dev/docs/serving/autoscaling/)：并发驱动伸缩和激活链路。
+- [containerd Stargz Snapshotter](https://github.com/containerd/stargz-snapshotter)：eStargz、远程 Snapshot 和 Lazy Pulling。
+- [Stargz Snapshotter Overview](https://github.com/containerd/stargz-snapshotter/blob/main/docs/overview.md)：按需取块、Prefetch 和缓存。
+- [Nydus RAFS](https://nydus.dev/docs/concepts/rafs/)：块级按需加载和校验。
+- [Dragonfly](https://d7y.io/docs/)：大规模镜像、模型和文件的 P2P 分发。
+- [OpenTelemetry Traces](https://opentelemetry.io/docs/concepts/signals/traces/)：为冷启动建立端到端 Trace。
+
 ## 11. 资源管控与多租户
 
 ### 11.1 Kubernetes 资源语义
@@ -426,6 +568,18 @@
 - 失败语义、幂等、断点续训、退出码与重启策略。
 - 配额借用、回收、公平性、成本归属和审计。
 - 训练数据、模型、日志和 Checkpoint 生命周期。
+
+### 学习资料
+
+- [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)：Request、Limit、cgroup 和扩展资源。
+- [Pod QoS Classes](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/)：Guaranteed、Burstable 和 BestEffort。
+- [Resource Quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/)：Namespace 级资源配额。
+- [Limit Ranges](https://kubernetes.io/docs/concepts/policy/limit-range/)：Pod、Container 和 PVC 的资源边界。
+- [Pod Priority and Preemption](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)：优先级与抢占。
+- [Pod Disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)：PDB 与自愿中断。
+- [Kubernetes Multi-tenancy](https://kubernetes.io/docs/concepts/security/multi-tenancy/)：多租户隔离边界。
+- [NVIDIA GPU Time-Slicing](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html)：共享 GPU 的隔离差异和限制。
+- [Kubernetes Security Checklist](https://kubernetes.io/docs/concepts/security/security-checklist/)：集群与工作负载安全基线。
 
 ## 12. 分布式系统与平台架构
 
@@ -452,6 +606,18 @@
 - 多集群管理、联邦调度、集群资源画像和故障转移。
 - 发布、灰度、回滚、Feature Gate 和配置治理。
 - 成本、利用率、可靠性、性能和研发效率之间的权衡。
+
+### 学习资料
+
+- [Raft Paper](https://raft.github.io/raft.pdf)：共识、Leader Election、日志复制和成员变更。
+- [etcd Learning](https://etcd.io/docs/v3.7/learning/)：Raft、API 保证和数据模型。
+- [etcd API Guarantees](https://etcd.io/docs/v3.7/learning/api_guarantees/)：线性一致性、Watch 和租约语义。
+- [Google SRE Book](https://sre.google/sre-book/table-of-contents/)：SLO、容量、过载和故障处理。
+- [Google SRE: Service Level Objectives](https://sre.google/sre-book/service-level-objectives/)：SLI、SLO、SLA 和错误预算。
+- [Google SRE: Handling Overload](https://sre.google/sre-book/handling-overload/)：限流、负载保护和降级。
+- [Google SRE: Cascading Failures](https://sre.google/sre-book/addressing-cascading-failures/)：重试风暴、慢启动和级联故障。
+- [CNCF Platforms White Paper](https://tag-app-delivery.cncf.io/whitepapers/platforms/)：平台工程、能力抽象和开发者体验。
+- [Kubernetes Multi-cluster SIG](https://multicluster.sigs.k8s.io/)：多集群 API 和相关项目入口。
 
 ## 13. 可观测性与性能工程
 
@@ -487,6 +653,20 @@
 - 写一份包含基线、环境、负载、假设、实验、数据和结论的性能报告。
 - 能说明优化吞吐为何可能恶化尾延迟，以及如何确定合理目标。
 
+### 学习资料
+
+- [Prometheus Data Model](https://prometheus.io/docs/concepts/data_model/)：时序数据、Metric 和 Label。
+- [PromQL Basics](https://prometheus.io/docs/prometheus/latest/querying/basics/)：查询、聚合和 Range Vector。
+- [Prometheus Instrumentation Practices](https://prometheus.io/docs/practices/instrumentation/)：不同服务类型的指标设计。
+- [Prometheus Histograms and Summaries](https://prometheus.io/docs/practices/histograms/)：延迟分布和分位数取舍。
+- [OpenTelemetry Concepts](https://opentelemetry.io/docs/concepts/)：Signals、Context、Sampling 和语义约定。
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)：Receiver、Processor 和 Exporter。
+- [Linux perf Examples](https://www.brendangregg.com/perf.html)：CPU、调用栈和 Off-CPU 分析示例。
+- [FlameGraph](https://github.com/brendangregg/FlameGraph)：火焰图工具与使用方法。
+- [BPF Performance Tools Examples](https://github.com/brendangregg/bpf-perf-tools-book)：BCC/bpftrace 示例。
+- [Google SRE: Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/)：黄金信号与告警设计。
+- [NVIDIA DCGM Exporter](https://github.com/NVIDIA/dcgm-exporter)：将 GPU 指标暴露给 Prometheus。
+
 ## 14. 镜像基础服务
 
 ### 14.1 Registry 架构
@@ -509,6 +689,19 @@
 - 最小基础镜像、漏洞扫描、SBOM、签名与验证。
 - Provenance、可复现构建和准入策略。
 - Secret 泄漏、恶意镜像、Tag 漂移和依赖投毒防护。
+
+### 学习资料
+
+- [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/main/spec.md)：Registry API、错误码和一致性要求。
+- [CNCF Distribution](https://github.com/distribution/distribution)：OCI Registry 参考实现。
+- [Harbor Documentation](https://goharbor.io/docs/)：复制、扫描、签名、配额和高可用。
+- [ORAS Documentation](https://oras.land/docs/)：通过 OCI Registry 分发通用 Artifact。
+- [Dragonfly](https://d7y.io/docs/)：P2P 镜像分发与预热。
+- [Nydus](https://nydus.dev/docs/concepts/rafs/)：块级镜像格式和远程加载。
+- [Sigstore Cosign: Signing Containers](https://docs.sigstore.dev/cosign/signing/signing_with_containers/)：镜像签名、验证和证明。
+- [SLSA Specification](https://slsa.dev/spec/)：构建来源与供应链完整性。
+- [SPDX Specification](https://spdx.dev/specifications/)：SBOM 开放标准和数据模型。
+- [Kubernetes Image Verification](https://kubernetes.io/docs/tasks/administer-cluster/verify-signed-artifacts/)：发布制品签名验证示例。
 
 ## 15. 智能运维 Agent
 
@@ -534,6 +727,17 @@
 - 离线评测、故障回放、成功率、误操作率、MTTD 和 MTTR。
 - 自动修复必须具备限权、灰度、回滚、验证和熔断机制。
 
+### 学习资料
+
+- [Google SRE: Effective Troubleshooting](https://sre.google/sre-book/effective-troubleshooting/)：Triage、观察、假设、实验和根因定位。
+- [Google SRE: Managing Incidents](https://sre.google/sre-book/managing-incidents/)：事件角色、协调和状态管理。
+- [Google SRE: Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)：无责复盘、根因和行动项。
+- [OpenAI Agents SDK: Tools](https://openai.github.io/openai-agents-python/tools/)：把诊断与修复动作建模为 Tool。
+- [OpenAI Agents SDK: Guardrails](https://openai.github.io/openai-agents-python/guardrails/)：输入、输出和工具执行约束。
+- [OpenAI Agents SDK: Tracing](https://openai.github.io/openai-agents-python/tracing/)：模型调用、工具调用和自定义 Span。
+- [OpenAI Agents SDK: Examples](https://openai.github.io/openai-agents-python/examples/)：工具审批和人工介入模式。
+- [MITRE ATLAS](https://atlas.mitre.org/)：AI 系统威胁建模和权限边界。
+
 ## 16. 开源与工程协作
 
 ### 16.1 推荐关注的项目
@@ -554,6 +758,16 @@
 - 设计提案、API Review、向后兼容和版本演进。
 - 清晰描述问题、测试证据、性能数据和方案权衡。
 - 持续的小型高质量贡献比一次大型但不可维护的改动更有说服力。
+
+### 学习资料
+
+- [Kubernetes Contributor Guide](https://www.kubernetes.dev/docs/guide/)：社区结构、开发流程、测试和 PR 规范。
+- [Kubernetes Community](https://kubernetes.io/community/)：SIG、Slack、会议和贡献入口。
+- [Kubernetes Enhancements](https://github.com/kubernetes/enhancements)：KEP 流程和设计示例。
+- [Kubernetes Code Generator](https://github.com/kubernetes/code-generator)：API、Client、Informer 和 Lister 生成工具。
+- [Volcano Contributing Guide](https://github.com/volcano-sh/volcano/blob/master/CONTRIBUTING.md)：Volcano 贡献流程。
+- [Kueue Contributing Guide](https://github.com/kubernetes-sigs/kueue/blob/main/CONTRIBUTING.md)：Kueue 开发和测试入口。
+- [containerd Contributing Guide](https://github.com/containerd/containerd/blob/main/CONTRIBUTING.md)：containerd 社区和贡献规范。
 
 ## 17. 知识优先级
 
@@ -583,6 +797,15 @@
 - 预测式弹性、跨集群调度和资源供给协同。
 - 基于 eBPF 的跨层性能观测平台。
 - 有安全边界、评测和自愈闭环的智能运维 Agent。
+
+### 学习资料
+
+- [Kubernetes Documentation](https://kubernetes.io/docs/home/)：P0 阶段的 Kubernetes 主线入口。
+- [containerd Documentation](https://github.com/containerd/containerd/tree/main/docs)：P0/P1 阶段的 Runtime 主线。
+- [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)：P0/P1 阶段的 GPU 管理入口。
+- [Volcano Documentation](https://volcano.sh/docs/)：P1 阶段的批调度实践。
+- [NCCL User Guide](https://docs.nvidia.com/deeplearning/nccl/user-guide/index.html)：P1 阶段的集合通信主线。
+- [Linux BPF Documentation](https://docs.kernel.org/bpf/index.html)：P0/P2 阶段的性能观测主线。
 
 ## 18. 推荐项目闭环
 
@@ -618,6 +841,17 @@
 - 覆盖 CPU throttling、I/O 阻塞、网络拥塞和慢 Worker 场景。
 - 输出可复现的故障报告与根因证据链。
 
+### 学习资料
+
+- [Scheduling Framework](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduling-framework/)：项目一的调度插件接口。
+- [Kueue Concepts](https://kueue.sigs.k8s.io/docs/concepts/)：项目一的队列和准入模型参考。
+- [Stargz Snapshotter](https://github.com/containerd/stargz-snapshotter)：项目二的 Lazy Pulling 参考实现。
+- [OpenTelemetry Traces](https://opentelemetry.io/docs/concepts/signals/traces/)：项目二的启动链路追踪基础。
+- [PyTorch Distributed Checkpoint](https://docs.pytorch.org/docs/stable/distributed.checkpoint.html)：项目三的分布式 Checkpoint API。
+- [Asynchronous Checkpointing](https://docs.pytorch.org/tutorials/recipes/distributed_async_checkpoint_recipe.html)：项目三的异步保存实践。
+- [BPF Performance Tools Examples](https://github.com/brendangregg/bpf-perf-tools-book)：项目四的跨层观测工具参考。
+- [NVIDIA DCGM Exporter](https://github.com/NVIDIA/dcgm-exporter)：项目四的 GPU 指标采集。
+
 ## 19. 面试准备检查表
 
 - 能在白板上画出 Kubernetes 创建 Pod 到容器进程启动的完整链路。
@@ -630,6 +864,15 @@
 - 能针对一个真实性能问题给出基线、假设、实验和数据。
 - 能讲清一个复杂项目中的取舍、失败尝试和可验证结果。
 - 能展示至少一个与 Kubernetes、容器或 AI Infra 相关的可运行项目或开源贡献。
+
+### 学习资料
+
+- [Kubernetes Components](https://kubernetes.io/docs/concepts/overview/components/)：复习 Pod 创建链路中的组件职责。
+- [Kubernetes Troubleshooting](https://kubernetes.io/docs/tasks/debug/)：面试故障题的官方排查入口。
+- [containerd CRI Architecture](https://github.com/containerd/containerd/blob/main/docs/cri/architecture.md)：复习 Pod 到容器进程的链路。
+- [NCCL Collective Operations](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html)：复习集合通信语义。
+- [Go Diagnostics](https://go.dev/doc/diagnostics)：复习 Go 性能分析工具。
+- [Google SRE: Effective Troubleshooting](https://sre.google/sre-book/effective-troubleshooting/)：组织故障分析回答的方法。
 
 ## 20. 避免“只会关键词”
 
@@ -646,237 +889,11 @@
 
 **理解 AI 负载 → 建立资源与性能模型 → 设计云原生机制 → 实现并测试 → 用数据验证 → 处理生产故障。**
 
-## 21. 学习资料索引
+### 学习资料
 
-> 选择原则：优先官方文档、项目源码文档、原始论文和大学公开课。带版本号的 Kubernetes、NVIDIA、PyTorch、KEDA 等文档可能随版本变化，阅读时应同时确认页面上的版本与特性状态。
-
-### 21.1 数据结构、算法与 Go
-
-- [MIT 6.006 Introduction to Algorithms](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/)：包含课程视频、讲义、习题和考试，适合系统补齐数据结构与算法。
-- [Go 官方文档入口](https://go.dev/doc/)：语言规范、Effective Go、诊断和教程的总入口。
-- [A Tour of Go](https://go.dev/tour/)：适合快速建立语法、接口、泛型和并发基础。
-- [Effective Go](https://go.dev/doc/effective_go)：Go 的命名、接口、错误处理和并发惯用法。
-- [The Go Memory Model](https://go.dev/ref/mem)：理解 happens-before、Channel、锁和原子操作的必读资料。
-- [Go Diagnostics](https://go.dev/doc/diagnostics)：pprof、trace、运行时统计和性能诊断入口。
-- [Data Race Detector](https://go.dev/doc/articles/race_detector)：并发竞态检测方法、限制和典型案例。
-- [Go Blog: Profiling Go Programs](https://go.dev/blog/pprof)：通过 pprof 分析 CPU 和内存瓶颈的完整示例。
-
-### 21.2 Linux 系统基础
-
-- [Linux Kernel Administrator's Guide](https://www.kernel.org/doc/html/latest/admin-guide/index.html)：内核管理文档总入口，覆盖内存、块设备、文件系统、CPU 和 namespace。
-- [Control Group v2](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html)：cgroup v2 的权威设计和各控制器接口。
-- [Linux namespaces 手册](https://man7.org/linux/man-pages/man7/namespaces.7.html)：各类 namespace 的关系、生命周期和 API。
-- [Linux memory management documentation](https://www.kernel.org/doc/html/latest/mm/index.html)：页表、分配器、回收、NUMA 和内存管理子系统。
-- [Linux networking documentation](https://www.kernel.org/doc/html/latest/networking/index.html)：内核网络栈、驱动、XDP 和协议相关文档。
-- [Linux filesystems documentation](https://www.kernel.org/doc/html/latest/filesystems/index.html)：VFS、OverlayFS、ext4 等文件系统机制。
-- [perf Wiki](https://perf.wiki.kernel.org/index.php/Main_Page)：perf 事件、采样和性能分析资料。
-- [eBPF Userspace API](https://docs.kernel.org/userspace-api/ebpf/index.html)：eBPF 程序、Map 和用户态 API 的内核文档入口。
-- [BPF Documentation](https://docs.kernel.org/bpf/index.html)：Verifier、程序类型、BTF、CO-RE 等内核侧资料。
-- [Brendan Gregg Linux Performance](https://www.brendangregg.com/linuxperf.html)：Linux 性能工具、USE 方法和分析图谱。
-
-### 21.3 容器、OCI 与 Runtime
-
-- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)：容器配置、状态和生命周期规范。
-- [OCI Image Specification](https://github.com/opencontainers/image-spec)：Manifest、Config、Layer、Descriptor 和 Image Index。
-- [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec)：镜像和 OCI Artifact 的 Push、Pull 与内容发现协议。
-- [runc](https://github.com/opencontainers/runc)：OCI Runtime Spec 的参考实现，适合结合源码理解容器创建。
-- [containerd Architecture](https://github.com/containerd/containerd/blob/main/docs/historical/design/architecture.md)：containerd 的服务、元数据、内容和执行子系统。
-- [containerd Runtime v2](https://github.com/containerd/containerd/blob/main/docs/runtime-v2.md)：containerd、shim 和 runc 的交互模型。
-- [containerd CRI Architecture](https://github.com/containerd/containerd/blob/main/docs/cri/architecture.md)：kubelet、CRI、CNI、Sandbox 和业务容器的创建链路。
-- [Kubernetes Container Runtime Interface](https://kubernetes.io/docs/concepts/containers/cri/)：Kubernetes 对容器运行时的接口定义。
-- [Kata Containers Architecture](https://github.com/kata-containers/kata-containers/blob/main/docs/design/architecture/README.md)：轻量虚拟机容器的隔离与架构设计。
-- [gVisor Architecture Guide](https://gvisor.dev/docs/architecture_guide/intro/)：用户态内核、系统调用拦截和沙箱边界。
-- [Firecracker Design](https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md)：MicroVM 的设备模型、启动和安全设计。
-
-### 21.4 Kubernetes 架构与 Controller
-
-- [Kubernetes Concepts](https://kubernetes.io/docs/concepts/)：官方概念文档总入口。
-- [Cluster Architecture](https://kubernetes.io/docs/concepts/architecture/)：API Server、etcd、Scheduler、Controller Manager、kubelet 和 kube-proxy。
-- [Controllers](https://kubernetes.io/docs/concepts/architecture/controller/)：控制循环与期望状态模型。
-- [Kubernetes API Concepts](https://kubernetes.io/docs/reference/using-api/api-concepts/)：resourceVersion、watch、并发控制、分页和 Patch。
-- [Custom Resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)：CRD、自定义 Controller 与 API Aggregation 的选择。
-- [Operator Pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)：用 CRD 与控制器封装领域运维知识。
-- [client-go](https://github.com/kubernetes/client-go)：ClientSet、Informer、Lister 和 WorkQueue 的官方 Go 客户端源码。
-- [sample-controller](https://github.com/kubernetes/sample-controller)：使用 client-go 编写 Controller 的最小官方示例。
-- [controller-runtime FAQ](https://github.com/kubernetes-sigs/controller-runtime/blob/main/FAQ.md)：Reconcile、Cache、Client 和事件处理的常见设计问题。
-- [Programming Kubernetes CRDs](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md)：Kubernetes API 约定，设计 CRD 时应重点阅读。
-- [etcd API guarantees](https://etcd.io/docs/v3.7/learning/api_guarantees/)：线性一致性、事务与 Watch 保证。
-- [Operating etcd clusters for Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/)：etcd 备份、恢复、扩容和运维入口。
-
-### 21.5 Kubernetes 调度与批任务
-
-- [Kubernetes Scheduler](https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/)：默认调度器的基本职责和选择流程。
-- [Scheduling Framework](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduling-framework/)：Scheduling Cycle、Binding Cycle 和插件扩展点。
-- [Scheduler Configuration](https://kubernetes.io/docs/reference/scheduling/config/)：调度 Profile、插件启停和参数配置。
-- [Resource Bin Packing](https://kubernetes.io/docs/concepts/scheduling-eviction/resource-bin-packing/)：按资源利用率进行装箱打分。
-- [Pod Topology Spread Constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)：可用区、节点和自定义拓扑域上的分布策略。
-- [Topology-Aware Workload Scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-aware-scheduling/)：PodGroup 与拓扑域协同放置；阅读时注意功能成熟度。
-- [Volcano Scheduler Overview](https://volcano.sh/docs/scheduler/overview/)：Gang、DRF、Binpack、Priority 等批调度插件。
-- [Volcano Queue](https://volcano.sh/docs/concepts/queue/)：队列、保证资源、权重和回收语义。
-- [Kueue Concepts](https://kueue.sigs.k8s.io/docs/concepts/)：ClusterQueue、LocalQueue、Cohort、Flavor 和 Admission Check。
-- [Kueue Fair Sharing](https://kueue.sigs.k8s.io/docs/concepts/fair_sharing/)：队列公平共享和资源借用。
-- [JobSet](https://jobset.sigs.k8s.io/docs/overview/)：分布式 AI/HPC 作业的多 Job 编排 API。
-- [Kubeflow Trainer](https://www.kubeflow.org/docs/components/trainer/)：PyTorch、MPI 等分布式训练作业在 Kubernetes 上的管理。
-
-### 21.6 GPU、设备管理与拓扑
-
-- [CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/contents.html)：Kernel、执行层级、内存、Stream 和多 GPU 编程。
-- [CUDA Programming Model](https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html)：CPU/GPU 异构系统、SM、内存和互连的入门章节。
-- [NVIDIA Multi-Instance GPU User Guide](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/)：MIG 的隔离、实例划分和管理模型。
-- [Kubernetes Device Plugins](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/)：节点设备发现、注册和分配接口。
-- [NVIDIA Kubernetes Device Plugin](https://github.com/NVIDIA/k8s-device-plugin)：GPU、MIG、Time-Slicing 和 MPS 的 Kubernetes 集成。
-- [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)：驱动、Device Plugin、Toolkit、MIG Manager 和 DCGM 的自动化管理。
-- [GPU Operator with MIG](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/gpu-operator-mig.html)：在 Kubernetes 中配置和切换 MIG 策略。
-- [Kubernetes Topology Manager](https://kubernetes.io/docs/tasks/administer-cluster/topology-manager/)：CPU、内存和设备的 NUMA 对齐策略。
-- [Kubernetes CPU Manager](https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/)：静态 CPU 独占和 CPU affinity。
-- [NVIDIA DCGM Documentation](https://docs.nvidia.com/datacenter/dcgm/latest/)：GPU 健康、诊断、性能指标和 Profiling。
-
-### 21.7 分布式训练
-
-- [PyTorch Distributed Overview](https://pytorch.org/tutorials/beginner/dist_overview.html)：DDP、FSDP、Tensor Parallel 和 DeviceMesh 的选择入口。
-- [PyTorch Distributed Tutorials](https://docs.pytorch.org/tutorials/distributed.html)：官方分布式训练教程集合。
-- [DistributedDataParallel](https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html)：DDP 的同步、进程模型与配置语义。
-- [FullyShardedDataParallel](https://docs.pytorch.org/docs/stable/fsdp.html)：参数、梯度和优化器状态分片机制。
-- [PyTorch Tensor Parallel](https://docs.pytorch.org/docs/stable/distributed.tensor.parallel.html)：基于 DeviceMesh 的张量并行 API。
-- [PyTorch Elastic](https://docs.pytorch.org/docs/stable/distributed.elastic.html)：Rendezvous、成员变化、容错和弹性启动。
-- [NCCL User Guide](https://docs.nvidia.com/deeplearning/nccl/user-guide/index.html)：Communicator、集合通信、拓扑发现和故障排查。
-- [NCCL Collective Operations](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html)：AllReduce、AllGather、ReduceScatter、AllToAll 等操作的准确语义。
-- [NCCL Tests](https://github.com/NVIDIA/nccl-tests)：测试集合通信正确性、算法带宽和总线带宽。
-- [Megatron-LM](https://github.com/NVIDIA/Megatron-LM)：张量、流水线、数据、专家和序列并行的工程实现。
-- [DeepSpeed ZeRO](https://www.deepspeed.ai/tutorials/zero/)：ZeRO 各阶段的状态分片和内存优化。
-
-### 21.8 大模型推理与 Agent 工作负载
-
-- [vLLM Documentation](https://docs.vllm.ai/en/stable/)：PagedAttention、高吞吐 Serving 和分布式推理入口。
-- [vLLM Architecture Overview](https://docs.vllm.ai/en/latest/design/arch_overview/)：Engine、Worker、Model Runner 和在线服务架构。
-- [vLLM Optimization and Tuning](https://docs.vllm.ai/en/latest/configuration/optimization/)：KV Cache、批处理、并发和显存相关调优。
-- [NVIDIA Triton Inference Server](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/)：Dynamic Batching、模型仓库、调度和指标。
-- [TensorRT-LLM Architecture](https://nvidia.github.io/TensorRT-LLM/architecture/overview.html)：推理 Runtime、并行策略和优化组件。
-- [Hugging Face Text Generation Inference](https://huggingface.co/docs/text-generation-inference/index)：连续批处理、量化和分布式模型 Serving 实践。
-- [OpenAI Agents SDK: Agents](https://openai.github.io/openai-agents-python/agents/)：Agent、Runner、Tool、Handoff 和 Guardrail 的基础模型。
-- [OpenAI Agents SDK: Tools](https://openai.github.io/openai-agents-python/tools/)：工具调用、审批、超时和错误处理。
-- [OpenAI Agents SDK: Testing](https://openai.github.io/openai-agents-python/testing/)：Agent 编排、工具与 Guardrail 的确定性测试方法。
-
-### 21.9 Kubernetes 与 AI 存储
-
-- [Kubernetes Storage](https://kubernetes.io/docs/concepts/storage/)：Volume、PV、PVC、StorageClass、Snapshot 等文档入口。
-- [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)：PV/PVC 生命周期、访问模式和回收策略。
-- [Storage Classes](https://kubernetes.io/docs/concepts/storage/storage-classes/)：动态供应、拓扑绑定和存储参数。
-- [Container Storage Interface Specification](https://github.com/container-storage-interface/spec)：CSI Identity、Controller 和 Node Service 的协议规范。
-- [CSI Developer Documentation](https://kubernetes-csi.github.io/docs/)：Sidecar、部署拓扑、Snapshot 和驱动开发。
-- [PyTorch Distributed Checkpoint](https://docs.pytorch.org/docs/stable/distributed.checkpoint.html)：分布式模型和优化器状态的并行保存/加载 API。
-- [PyTorch Asynchronous Checkpointing](https://docs.pytorch.org/tutorials/recipes/distributed_async_checkpoint_recipe.html)：降低 Checkpoint 对训练主循环的阻塞。
-- [PyTorch DataLoader](https://docs.pytorch.org/docs/stable/data.html)：多进程读取、Pinned Memory、Prefetch 和 Worker 模型。
-- [NVIDIA GPUDirect Storage](https://docs.nvidia.com/gpudirect-storage/index.html)：GPU 与存储之间直接 DMA 的入口文档。
-- [GPUDirect Storage Design Guide](https://docs.nvidia.com/gpudirect-storage/design-guide/index.html)：GDS 软件栈、拓扑和数据路径设计。
-
-### 21.10 Kubernetes 网络、RDMA 与 RoCE
-
-- [Kubernetes Services, Load Balancing, and Networking](https://kubernetes.io/docs/concepts/services-networking/)：Service、EndpointSlice、Ingress、Gateway 和 NetworkPolicy 总入口。
-- [CNI Specification](https://github.com/containernetworking/cni/blob/main/SPEC.md)：Runtime 调用网络插件的标准接口。
-- [Cilium Architecture](https://docs.cilium.io/en/stable/overview/component-overview/)：基于 eBPF 的容器网络、Service 和策略实现。
-- [Cilium kube-proxy replacement](https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/)：eBPF Service 转发路径和部署模式。
-- [Multus CNI](https://k8snetworkplumbingwg.github.io/multus-cni/docs/quickstart.html)：为 Pod 附加多张网络接口。
-- [SR-IOV Network Device Plugin](https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin)：在 Kubernetes 中发现和分配 VF 资源。
-- [RDMA CNI](https://github.com/k8snetworkplumbingwg/rdma-cni)：把 RDMA 设备放入 Pod Network Namespace。
-- [RDMA Aware Networks Programming User Manual](https://docs.nvidia.com/rdma-aware-networks-programming-user-manual-1-7.pdf)：Verbs、QP、CQ、MR、Send/Receive 和 RDMA CM。
-- [NVIDIA RoCE Documentation](https://docs.nvidia.com/networking/display/nvidiamlnxofeddocumentationv24101140105lts/rdma%2Bover%2Bconverged%2Bethernet%2B%28roce%29)：RoCEv1/v2、GID、PFC 和流量分类。
-- [NCCL GPU Troubleshooting](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/gpu_troubleshooting.html)：PCIe、NVLink、ACS、容器拓扑发现等问题。
-- [GPUDirect RDMA Documentation](https://docs.nvidia.com/cuda/gpudirect-rdma/)：GPU 显存与第三方 PCIe 设备之间的 DMA 路径。
-
-### 21.11 弹性伸缩与冷启动
-
-- [Kubernetes Autoscaling Workloads](https://kubernetes.io/docs/concepts/workloads/autoscaling/)：HPA、VPA 和工作负载伸缩总览。
-- [Horizontal Pod Autoscaling](https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/)：算法、指标、容忍区间、稳定窗口和行为配置。
-- [Node Autoscaling](https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/)：节点供给、调度约束和自动扩容交互。
-- [KEDA Concepts](https://keda.sh/docs/latest/concepts/)：事件驱动伸缩、ScaledObject 和 Scale-to-Zero。
-- [Knative Serving Autoscaling](https://knative.dev/docs/serving/autoscaling/)：并发驱动伸缩、Scale-to-Zero 和激活链路。
-- [containerd Stargz Snapshotter](https://github.com/containerd/stargz-snapshotter)：eStargz、远程 Snapshot 和 Lazy Pulling。
-- [Stargz Snapshotter Overview](https://github.com/containerd/stargz-snapshotter/blob/main/docs/overview.md)：按需取块、Prefetch 和本地缓存机制。
-- [Nydus RAFS](https://nydus.dev/docs/concepts/rafs/)：面向容器镜像的按需加载、块级缓存和校验。
-- [Dragonfly Documentation](https://d7y.io/docs/)：大规模镜像、模型和文件的 P2P 分发。
-- [OpenTelemetry Traces](https://opentelemetry.io/docs/concepts/signals/traces/)：为端到端冷启动瀑布图建立 Trace/Span 模型。
-
-### 21.12 资源管控与多租户
-
-- [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)：Request、Limit、cgroup 和扩展资源语义。
-- [Pod Quality of Service Classes](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/)：Guaranteed、Burstable、BestEffort 和驱逐优先级。
-- [Resource Quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/)：Namespace 级对象与计算资源配额。
-- [Limit Ranges](https://kubernetes.io/docs/concepts/policy/limit-range/)：单个 Pod、Container、PVC 的默认值和边界。
-- [Pod Priority and Preemption](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)：优先级、抢占和非抢占式 PriorityClass。
-- [Pod Disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)：PDB、自愿中断和高可用约束。
-- [Multi-tenancy](https://kubernetes.io/docs/concepts/security/multi-tenancy/)：软多租户、硬多租户及隔离边界。
-- [NVIDIA GPU Time-Slicing](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html)：共享 GPU 的配置、隔离差异和限制。
-- [Kubernetes Security Checklist](https://kubernetes.io/docs/concepts/security/security-checklist/)：API、工作负载、网络和认证授权基线。
-
-### 21.13 分布式系统、高可用与平台工程
-
-- [Designing Data-Intensive Applications course materials](https://github.com/ept/ddia-references)：《Designing Data-Intensive Applications》各章的论文与资料索引。
-- [Raft Paper](https://raft.github.io/raft.pdf)：共识、Leader Election、日志复制和成员变更的原始论文。
-- [etcd Learning](https://etcd.io/docs/v3.7/learning/)：Raft、API 保证、数据模型和工程设计。
-- [etcd API Guarantees](https://etcd.io/docs/v3.7/learning/api_guarantees/)：线性一致性、Watch 顺序和租约语义。
-- [Google SRE Book](https://sre.google/sre-book/table-of-contents/)：SLO、容量、过载、故障处理和发布工程。
-- [Google SRE: Service Level Objectives](https://sre.google/sre-book/service-level-objectives/)：SLI、SLO、SLA 与错误预算。
-- [Google SRE: Handling Overload](https://sre.google/sre-book/handling-overload/)：限流、负载保护和降级策略。
-- [Google SRE: Addressing Cascading Failures](https://sre.google/sre-book/addressing-cascading-failures/)：级联故障、重试风暴、慢启动和容量问题。
-- [CNCF Platforms White Paper](https://tag-app-delivery.cncf.io/whitepapers/platforms/)：平台工程、能力抽象和开发者体验。
-- [Kubernetes Multi-cluster SIG](https://multicluster.sigs.k8s.io/)：多集群 API、工作组和相关项目入口。
-
-### 21.14 可观测性与性能工程
-
-- [Prometheus Data Model](https://prometheus.io/docs/concepts/data_model/)：时序数据、Metric Name、Label 与 Cardinality。
-- [PromQL Basics](https://prometheus.io/docs/prometheus/latest/querying/basics/)：查询、聚合、Range Vector 和函数。
-- [Prometheus Instrumentation Practices](https://prometheus.io/docs/practices/instrumentation/)：在线服务、离线任务和批处理的指标设计。
-- [Prometheus Histograms and Summaries](https://prometheus.io/docs/practices/histograms/)：延迟分布、分位数和聚合取舍。
-- [OpenTelemetry Concepts](https://opentelemetry.io/docs/concepts/)：Signals、Context Propagation、Sampling 和 Semantic Conventions。
-- [OpenTelemetry Signals](https://opentelemetry.io/docs/concepts/signals/)：Metrics、Logs、Traces、Baggage 和 Profiles。
-- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)：Receiver、Processor、Exporter 和部署拓扑。
-- [Linux perf Examples](https://www.brendangregg.com/perf.html)：CPU、调用栈、Off-CPU 和硬件事件分析示例。
-- [FlameGraph](https://github.com/brendangregg/FlameGraph)：火焰图生成工具与解释资料。
-- [BPF Performance Tools Book Examples](https://github.com/brendangregg/bpf-perf-tools-book)：BCC/bpftrace 性能工具示例。
-- [Google SRE: Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/)：四个黄金信号、白盒/黑盒监控和告警设计。
-- [Google SRE: Service Level Objectives](https://sre.google/sre-book/service-level-objectives/)：从用户体验反推性能与可靠性指标。
-- [NVIDIA DCGM Exporter](https://github.com/NVIDIA/dcgm-exporter)：将 GPU/DCGM 指标暴露给 Prometheus。
-
-### 21.15 镜像服务与供应链安全
-
-- [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/main/spec.md)：Registry API 的端点、错误码和一致性要求。
-- [CNCF Distribution](https://github.com/distribution/distribution)：OCI Registry 的参考实现。
-- [Harbor Documentation](https://goharbor.io/docs/)：企业级 Registry 的复制、扫描、签名、配额和高可用实践。
-- [ORAS Documentation](https://oras.land/docs/)：通过 OCI Registry 分发镜像之外的 Artifact。
-- [Dragonfly Documentation](https://d7y.io/docs/)：P2P 镜像分发、预热和大规模下载加速。
-- [Nydus Documentation](https://nydus.dev/docs/)：块级镜像格式、远程加载和运行时集成。
-- [Sigstore Cosign: Signing Containers](https://docs.sigstore.dev/cosign/signing/signing_with_containers/)：容器镜像的签名、验证与证明。
-- [SLSA Specification](https://slsa.dev/spec/)：构建来源、供应链完整性和成熟度模型。
-- [SPDX Specification](https://spdx.dev/specifications/)：SBOM 的开放标准和数据模型。
-- [Kubernetes Image Verification](https://kubernetes.io/docs/tasks/administer-cluster/verify-signed-artifacts/)：Kubernetes 发布制品签名验证示例。
-
-### 21.16 智能运维 Agent
-
-- [Google SRE: Effective Troubleshooting](https://sre.google/sre-book/effective-troubleshooting/)：Triage、观察、假设、实验与根因定位方法。
-- [Google SRE: Managing Incidents](https://sre.google/sre-book/managing-incidents/)：事件角色、协调、沟通和状态管理。
-- [Google SRE: Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)：无责复盘、根因与行动项。
-- [OpenAI Agents SDK: Tools](https://openai.github.io/openai-agents-python/tools/)：把诊断、查询和修复动作建模为受控 Tool。
-- [OpenAI Agents SDK: Guardrails](https://openai.github.io/openai-agents-python/guardrails/)：输入、输出和工具执行前后的约束。
-- [OpenAI Agents SDK: Tracing](https://openai.github.io/openai-agents-python/tracing/)：记录模型调用、工具调用、Handoff 和自定义 Span。
-- [OpenAI Agents SDK: Human-in-the-loop examples](https://openai.github.io/openai-agents-python/examples/)：工具审批、状态序列化和人工介入模式。
-- [MITRE ATLAS](https://atlas.mitre.org/)：AI 系统攻击技术与安全威胁建模，可用于设计 Agent 权限边界。
-
-### 21.17 开源贡献
-
-- [Kubernetes Contributor Guide](https://www.kubernetes.dev/docs/guide/)：社区结构、开发流程、测试和 PR 规范。
-- [Kubernetes Community](https://kubernetes.io/community/)：SIG、Slack、会议和贡献入口。
-- [Kubernetes Enhancements](https://github.com/kubernetes/enhancements)：KEP 流程、功能生命周期和设计示例。
-- [Kubernetes Code Generation](https://github.com/kubernetes/code-generator)：API、Client、Informer 和 Lister 代码生成工具。
-- [Volcano Contributing Guide](https://github.com/volcano-sh/volcano/blob/master/CONTRIBUTING.md)：Volcano 的开发与贡献流程。
-- [Kueue Contributing Guide](https://github.com/kubernetes-sigs/kueue/blob/main/CONTRIBUTING.md)：Kueue 的开发、测试和贡献入口。
-- [containerd Contributing Guide](https://github.com/containerd/containerd/blob/main/CONTRIBUTING.md)：containerd 社区、DCO 和代码贡献规范。
-
-### 21.18 推荐阅读顺序
-
-1. **第一阶段：系统与语言**：21.1 → 21.2 → 21.3，建立 Go、Linux、OCI 和 Runtime 的底层模型。
-2. **第二阶段：Kubernetes 核心**：21.4 → 21.5 → 21.12，掌握控制循环、调度和资源治理。
-3. **第三阶段：AI 工作负载**：21.6 → 21.7 → 21.8，理解 GPU、训练通信和推理服务。
-4. **第四阶段：高性能数据路径**：21.9 → 21.10 → 21.11，学习存储、RDMA/RoCE 和冷启动。
-5. **第五阶段：生产工程**：21.13 → 21.14 → 21.15 → 21.16，形成可靠性、可观测和自动化闭环。
-6. **持续进行**：21.17，边学习边复现 issue、阅读源码并尝试小型开源贡献。
+- [Kubernetes Source Code](https://github.com/kubernetes/kubernetes)：用源码验证控制面、调度器和 kubelet 机制。
+- [containerd Source Code](https://github.com/containerd/containerd)：用源码验证 Runtime 和镜像链路。
+- [NCCL Tests](https://github.com/NVIDIA/nccl-tests)：用基准数据验证集合通信性能。
+- [Prometheus Instrumentation Practices](https://prometheus.io/docs/practices/instrumentation/)：把抽象的“性能好”转成可测指标。
+- [Google SRE: Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/)：建立以证据为基础的系统判断方式。
+- [Kubernetes Contributor Guide](https://www.kubernetes.dev/docs/guide/)：通过复现问题和贡献代码检验理解深度。
