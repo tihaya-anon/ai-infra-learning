@@ -1,0 +1,49 @@
+# Keep Codex focused on source code and learning notes. Patterns use
+# gitignore-style syntax; sensitive files are excluded even when untracked.
+
+# Version control and local tooling metadata
+.git/
+.idea/
+.vscode/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.kubeconfig
+kubeconfig
+.kube/
+
+# Dependencies and generated output
+node_modules/
+vendor/
+bin/
+build/
+dist/
+target/
+generated/
+coverage/
+tmp/
+temp/
+*.log
+
+# Large AI/ML artifacts
+data/
+datasets/
+models/
+checkpoints/
+runs/
+wandb/
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.bin

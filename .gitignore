@@ -1,0 +1,69 @@
+# Operating systems and editors
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.kubeconfig
+kubeconfig
+
+# Logs, coverage, and temporary files
+*.log
+coverage/
+.coverage
+*.out
+tmp/
+temp/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Go
+bin/
+dist/
+vendor/
+
+# Node.js
+node_modules/
+.pnpm-store/
+
+# Build and generated artifacts
+build/
+target/
+generated/
+
+# AI/ML datasets, model weights, and checkpoints
+data/
+datasets/
+models/
+checkpoints/
+runs/
+wandb/
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.bin
+
+# Local cluster state
+.kube/
+.kind/
