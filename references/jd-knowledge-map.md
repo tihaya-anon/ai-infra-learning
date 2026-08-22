@@ -357,6 +357,48 @@
 - vLLM、Triton Inference Server、TensorRT-LLM 等系统的职责与差异。
 - 在线推理、离线推理和训练任务混部的隔离策略。
 
+#### 7.3.1 vLLM 的定位与边界
+
+vLLM 首先属于**推理引擎与模型服务数据面**。它位于 OpenAI-compatible API、模型权重和 GPU Kernel 之间，负责把并发请求高效地变成 Token；它不是 Kubernetes 调度器、集群 Autoscaler、API Gateway、模型仓库或完整的推理平台。
+
+核心请求路径：
+
+`HTTP 请求 -> Tokenizer/Processor -> Engine -> Scheduler -> KV Cache Manager -> Worker/Model Runner -> CUDA Kernel/NCCL -> 流式响应`
+
+需要能解释这条路径中的关键机制：
+
+- Engine、Scheduler、Worker、Model Runner 和 KV Cache Manager 的职责边界。
+- PagedAttention 如何按块管理 KV Cache，减少外部碎片，并让非连续物理块服务逻辑连续的序列。
+- Continuous Batching 如何在迭代粒度合并新请求；Chunked Prefill 如何在长 Prompt 与 Decode 之间分配 Token Budget。
+- Prefix Caching 的命中条件、复用收益、哈希与淘汰，以及它为什么不等于跨实例共享 KV Cache。
+- `max_model_len`、`max_num_seqs`、批次 Token Budget 和显存利用率之间的容量约束。
+- 请求排队、KV Cache 不足、抢占/重计算和过载如何影响 TTFT、TPOT、吞吐与 Goodput。
+- 单 GPU、Tensor Parallel、Pipeline Parallel 和多副本之间的适用条件与通信代价。
+- OpenAI-compatible Server 提供模型服务接口，但认证、租户隔离、限流和公网暴露仍应由外围组件补齐。
+
+#### 7.3.2 vLLM 与知识地图各部分的连接
+
+vLLM 可以作为贯穿多个章节的实验工作负载，但它与各部分的关系并不相同：第 7、13 节是直接研究对象；调度、存储、网络、冷启动和多租户章节把它当作需要承载和优化的数据面；Go、控制面和 Registry 等章节只通过外围系统间接连接。
+
+| 对应章节 | 与 vLLM 的连接 | 应回答的问题 |
+| --- | --- | --- |
+| 3 Linux / 4 容器运行时 | 进程模型、共享内存、Pinned Memory、cgroup、GPU 设备与容器启动 | CPU throttling、内存锁定或 `/dev/shm` 为什么会拖慢或破坏推理？ |
+| 5 Kubernetes / 6 AI 调度 | GPU Request、Device Plugin、MIG、拓扑与多副本放置 | 一个 TP/PP 实例需要怎样声明资源和拓扑约束？它与水平副本如何取舍？ |
+| 7 AI 推理 | 请求调度、PagedAttention、KV Cache、并行和量化 | 不同 Prompt/Output 长度与到达率如何改变 TTFT、TPOT 和吞吐？ |
+| 8 AI 存储 | 权重下载、模型缓存、本地 NVMe、内存映射与 KV Cache 卸载 | 冷启动时间花在哪里？本地模型缓存如何在容量和一致性之间取舍？ |
+| 9 AI 网络 | API 流量、跨 GPU/节点的 NCCL 集合通信 | TP 跨卡或跨节点后，延迟受 NVLink、PCIe、RDMA 和拓扑怎样影响？ |
+| 10 弹性与冷启动 | Pod/节点扩容、镜像拉取、权重加载、Engine 初始化和预热 | 从请求到首个 Ready 副本的瀑布图是什么？Scale-from-zero 是否满足 SLO？ |
+| 11 多租户 / 12 平台 | GPU 共享、限流、背压、路由、灰度和故障域 | 如何防止长请求或高并发租户耗尽 KV Cache，并避免重试放大？ |
+| 13 可观测性 | `/metrics`、请求指标、队列、KV Cache、GPU 与容器指标关联 | 指标能否区分算力饱和、KV Cache 压力、排队、CPU 和网络瓶颈？ |
+| 14 镜像 / 15 Agent | 大镜像分发、模型服务后端、会话前缀和突发调用 | 镜像与模型如何预热？Agent 的共享前缀能否获得可测的缓存收益？ |
+
+#### 验证方式
+
+- 从一次请求开始，结合源码、日志和指标画出 Engine 内部时序，说明 Prefill、Decode、调度与 KV Cache 分配发生在哪里。
+- 固定模型和硬件，分别改变输入长度、输出长度、到达率和并发，画出 TTFT、TPOT、吞吐和 Goodput 的拐点。
+- 对 Prefix Caching、Chunked Prefill、量化或并行策略做单变量对照；不能只报告“更快”，还要解释收益来源和退化条件。
+- 在 Kubernetes 中复现一次冷启动或过载问题，并把 vLLM 指标与 Pod、节点和 GPU 指标组成证据链。
+
 ### 7.4 Agent 工作负载
 
 - Agent 的无状态计算与有状态会话、工具执行和沙箱隔离。
@@ -390,6 +432,10 @@
 - [vLLM Documentation](https://docs.vllm.ai/en/stable/)：PagedAttention、高吞吐 Serving 和分布式推理。
 - [vLLM Architecture Overview](https://docs.vllm.ai/en/latest/design/arch_overview/)：Engine、Worker 和 Model Runner 架构。
 - [vLLM Optimization and Tuning](https://docs.vllm.ai/en/latest/configuration/optimization/)：KV Cache、批处理、并发和显存调优。
+- [vLLM Benchmark CLI](https://docs.vllm.ai/en/latest/benchmarking/cli/)：构造请求到达率、并发和长度分布，测量 TTFT、TPOT 与吞吐。
+- [vLLM Production Metrics](https://docs.vllm.ai/en/latest/usage/metrics/)：OpenAI-compatible Server 暴露的队列、缓存和请求指标。
+- [vLLM Parallelism and Scaling](https://docs.vllm.ai/en/latest/serving/parallelism_scaling/)：单机与多机 TP/PP 部署及通信边界。
+- [vLLM Production Stack](https://docs.vllm.ai/projects/production-stack/en/latest/)：Kubernetes 部署、路由、监控与 KV Cache 卸载的参考实现。
 - [NVIDIA Triton Inference Server](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/)：Dynamic Batching、调度和指标。
 - [TensorRT-LLM Architecture](https://nvidia.github.io/TensorRT-LLM/architecture/overview.html)：推理 Runtime 和并行策略。
 - [OpenAI Agents SDK: Agents](https://openai.github.io/openai-agents-python/agents/)：Agent、Runner、Tool 和 Guardrail。
@@ -784,6 +830,7 @@
 ### P1：形成岗位竞争力
 
 - Volcano/Kueue/Kubeflow 中至少一个项目的源码与实践。
+- 能用 vLLM 建立推理性能模型，解释调度、KV Cache、并行策略和过载行为，并在 Kubernetes 上完成部署与诊断。
 - RDMA/RoCE、NCCL、SR-IOV 和 GPUDirect RDMA。
 - Checkpoint、模型加载、多级缓存和高性能数据读取。
 - 镜像加速、Lazy Pulling、P2P 分发和冷启动优化。
@@ -808,6 +855,49 @@
 - [Linux BPF Documentation](https://docs.kernel.org/bpf/index.html)：P0/P2 阶段的性能观测主线。
 
 ## 18. 推荐项目闭环
+
+### vLLM 专项 Lab 路线
+
+建议拆成三个递进 Lab，而不是一个包含所有变量的大实验。前两个 Lab 聚焦 vLLM 本身，第三个 Lab 把它接入 Kubernetes 与 AI Infra；每个实验都固定 vLLM 版本、模型版本、镜像 Digest、GPU 型号和驱动/CUDA 环境，并保留原始结果。
+
+#### Lab 1：从请求到 Token 的性能基线（单 GPU）
+
+**目标**：建立 Prefill、Decode、并发和显存之间的第一性性能模型。
+
+- 用小型 Instruct 模型启动 `vllm serve`，通过 OpenAI-compatible API 验证非流式和流式请求。
+- 用 `vllm bench serve` 构造短输入/长输出、长输入/短输出以及混合长度三类负载。
+- 逐级增加 `request-rate` 和 `max-concurrency`，找到吞吐饱和点和 P99 延迟拐点。
+- 记录 TTFT、TPOT、端到端延迟、Input/Output Tokens/s、GPU 利用率、显存、CPU 和队列深度。
+- 用观测结果解释 Prefill 更偏计算密集、Decode 更偏访存密集，以及为什么吞吐最优点通常不是延迟最优点。
+
+**交付物与验收**：可复现的启动/压测命令、环境清单、原始 JSON、四张核心曲线和一页结论；能够根据给定 SLO 选出最大安全到达率，而不是只给出峰值吞吐。
+
+#### Lab 2：Scheduler 与 KV Cache 对照实验（单 GPU）
+
+**目标**：把 PagedAttention、Continuous Batching、Chunked Prefill、Prefix Caching 和过载从名词变成可观测行为。
+
+- 设计共享长前缀与完全随机前缀两组请求，对比 Prefix Caching 开关前后的命中率、TTFT 和吞吐。
+- 混合长 Prefill 与短 Decode 请求，改变批次 Token Budget、最大序列数等容量参数，观察公平性和 Head-of-Line Blocking。
+- 提高上下文长度和并发直至 KV Cache 紧张，记录缓存使用、等待请求、抢占/重计算和尾延迟。
+- 选择一个请求，从 API Server 追到 Scheduler、KV Cache Manager 和 Model Runner，对照源码标注关键状态变化。
+- 可选：增加量化或 Speculative Decoding 对照，但仍保持一次只改变一个变量。
+
+**交付物与验收**：实验矩阵、指标截图/导出、源码调用图和机制解释；能够预测某项配置更改会优先影响 TTFT、TPOT、吞吐还是可接纳并发，并用数据证伪或确认。
+
+#### Lab 3：Kubernetes 上的 vLLM 跨层实验（1 GPU 起步，2+ GPU 可选）
+
+**目标**：理解 vLLM 作为推理数据面时，容器、调度、存储、网络、弹性和可观测性怎样共同决定服务表现。
+
+- 先用原生 Deployment、Service、GPU Request、Startup/Readiness Probe 部署单副本；再阅读 vLLM Production Stack，比较其额外解决的路由与运维问题。
+- 接入 Prometheus，关联 vLLM `/metrics`、kube-state-metrics、cAdvisor 和 DCGM Exporter，制作最小诊断面板。
+- 分别测量冷启动、节点已有镜像、节点已有模型权重和进程已预热四种路径，绘制启动瀑布图。
+- 注入 Pod 重启、并发突发、CPU Throttling、模型缓存未命中和 GPU 显存压力，判断故障发生在哪一层。
+- 配置 HPA/KEDA 时使用队列或并发等领先指标，验证扩容延迟、过载保护、终止排空和 SLO，而不是只用 GPU 利用率。
+- 可选多 GPU 扩展：比较单卡、多副本、单机 TP 和跨节点 TP/PP，结合 GPU/NIC 拓扑与 NCCL 指标解释差异。
+
+**交付物与验收**：Kubernetes Manifests、Grafana Dashboard、故障注入脚本、冷启动瀑布图和容量报告；能够区分应用调度与 Kubernetes 调度，并给出一个有数据支撑的部署选择。
+
+完成顺序应是 `Lab 1 -> Lab 2 -> Lab 3`。只有一张 GPU 时也能完成全部必做项；多 GPU、RDMA、KV Cache 卸载和跨实例路由适合作为后续扩展，不应成为入门阻塞项。
 
 ### 项目一：GPU 拓扑感知批调度器
 
@@ -851,6 +941,10 @@
 - [Asynchronous Checkpointing](https://docs.pytorch.org/tutorials/recipes/distributed_async_checkpoint_recipe.html)：项目三的异步保存实践。
 - [BPF Performance Tools Examples](https://github.com/brendangregg/bpf-perf-tools-book)：项目四的跨层观测工具参考。
 - [NVIDIA DCGM Exporter](https://github.com/NVIDIA/dcgm-exporter)：项目四的 GPU 指标采集。
+- [vLLM Quickstart](https://docs.vllm.ai/en/latest/getting_started/quickstart/)：Lab 1 的服务启动与 OpenAI-compatible API。
+- [vLLM Benchmark CLI](https://docs.vllm.ai/en/latest/benchmarking/cli/)：Lab 1/2 的负载、并发和延迟测量工具。
+- [vLLM Production Metrics](https://docs.vllm.ai/en/latest/usage/metrics/)：Lab 2/3 的引擎队列、请求和 KV Cache 指标。
+- [vLLM Kubernetes Deployment](https://docs.vllm.ai/en/stable/deployment/k8s/)：Lab 3 的 GPU 容器部署起点。
 
 ## 19. 面试准备检查表
 
