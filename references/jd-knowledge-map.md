@@ -201,6 +201,7 @@
 - 手工使用 namespace、cgroup 和 pivot_root 构建一个最小容器。
 - 跟踪一次 Pod 创建，从 API 请求定位到容器主进程。
 - 对镜像拉取和容器启动链路分段打点，找出冷启动主导因素。
+- 完成 [Linux Container Boundaries to vLLM Lab](../labs/3_4_linux_container_vllm/README.md)，把 namespace、cgroup、OverlayFS、网络和 IPC 映射到真实推理进程。
 
 ### 学习资料
 

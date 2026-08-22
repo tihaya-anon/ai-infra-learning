@@ -239,7 +239,22 @@ _        [cacheLineSize]byte
 
 ## 3. LockFreeQueue：Michael-Scott MPMC 队列
 
-MPMC 实现使用带哨兵节点的单链表。`head` 指向当前哨兵，`tail` 指向已知的最后节点：
+MPMC 实现使用带哨兵节点的单链表。理解它时先记住三个不变量：
+
+- `head` 指向当前哨兵，`head.next` 才是第一个可出队的元素。
+- 链表的 `next` 是队列内容的事实；`tail` 只是用于快速找到队尾的导航指针，允许暂时落后。
+- 入队竞争发生在队尾节点的 `next` 上，出队竞争发生在 `head` 上；同一个 CAS 目标同时只能有一个成功者。
+
+队列刚创建时，`head` 和 `tail` 都指向同一个 dummy 节点：
+
+```mermaid
+flowchart LR
+    Head["head"] --> Dummy["dummy"]
+    Tail["tail"] --> Dummy
+    Dummy --> Nil["nil"]
+```
+
+有三个元素时，指针关系如下：
 
 ```mermaid
 flowchart LR
@@ -251,7 +266,9 @@ flowchart LR
     Tail["tail"] --> C
 ```
 
-### 入队
+此时可以出队的是 `A`，不是 `dummy`。当 `A` 出队后，`head` 会移动到 `A`，`A` 随即成为新的哨兵。
+
+### 3.1 没有竞争时如何入队
 
 1. 读取 `tail` 和 `tail.next`。
 2. 如果 `tail.next != nil`，说明另一个 Goroutine 已链接新节点但尚未推进 `tail`，当前 Goroutine帮助推进它。
@@ -259,6 +276,108 @@ flowchart LR
 4. 尝试推进 `tail`。即使推进失败，入队也已经成功。
 
 成功修改 `tail.next` 的 CAS 是入队的线性化点。
+
+假设空队列入队 `A`，链表会经历两个变化：先链接节点，再推进 `tail`。
+
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant D as dummy.next
+    participant T as tail
+
+    P->>T: Load，得到 dummy
+    P->>D: Load，得到 nil
+    P->>D: CAS(nil, A)
+    D-->>P: 成功，A 已经入队
+    Note over P,D: 入队线性化点
+    P->>T: CAS(dummy, A)
+    T-->>P: 推进成功或已被别人推进
+```
+
+```mermaid
+flowchart LR
+    subgraph S0["1. 初始状态"]
+        H0["head"] --> D0["dummy"]
+        T0["tail"] --> D0
+        D0 --> N0["nil"]
+    end
+
+    subgraph S1["2. CAS 链接 A，入队已经成功"]
+        H1["head"] --> D1["dummy"]
+        T1["tail"] --> D1
+        D1 --> A1["A"]
+        A1 --> N1["nil"]
+    end
+
+    subgraph S2["3. 推进 tail"]
+        H2["head"] --> D2["dummy"]
+        D2 --> A2["A"]
+        T2["tail"] --> A2
+        A2 --> N2["nil"]
+    end
+
+    S0 --> S1 --> S2
+```
+
+推进 `tail` 不是入队成功的条件。只要 `dummy.next` 已经从 `nil` 变成 `A`，其他 Goroutine 就能观察到并继续操作。
+
+### 3.2 两个 Producer 同时入队
+
+假设 P1 准备入队 `A`，P2 准备入队 `B`。两者都读到相同的旧队尾，都会尝试把 `dummy.next` 从 `nil` 改成自己的节点：
+
+```mermaid
+sequenceDiagram
+    participant P1 as Producer 1：A
+    participant D as dummy.next
+    participant T as tail
+    participant P2 as Producer 2：B
+
+    P1->>T: Load，得到 dummy
+    P2->>T: Load，得到 dummy
+    P1->>D: Load，得到 nil
+    P2->>D: Load，得到 nil
+    P1->>D: CAS(nil, A)
+    D-->>P1: 成功
+    Note over P1,D: A 的入队线性化点
+    P2->>D: CAS(nil, B)
+    D-->>P2: 失败，不能覆盖 A
+    Note over P1: 此时即使 P1 被暂停
+    P2->>D: 重新读取，发现 next 是 A
+    P2->>T: CAS(dummy, A)，帮助推进 tail
+    P2->>D: 下一轮在 A.next 上 CAS(nil, B)
+    D-->>P2: 成功，B 排在 A 后面
+```
+
+对应的链表状态是：
+
+```mermaid
+flowchart LR
+    subgraph R0["两个 Producer 看到同一个空位"]
+        D0["dummy"] --> N0["nil"]
+        T0["tail"] --> D0
+        P1["P1: CAS nil -> A"] -.竞争.-> N0
+        P2["P2: CAS nil -> B"] -.竞争.-> N0
+    end
+
+    subgraph R1["P1 获胜；P2 的 CAS 失败"]
+        D1["dummy"] --> A1["A"]
+        A1 --> N1["nil"]
+        T1["tail 暂时落后"] --> D1
+    end
+
+    subgraph R2["P2 帮助推进并在下一空位重试"]
+        D2["dummy"] --> A2["A"]
+        A2 --> B2["B"]
+        B2 --> N2["nil"]
+        T2["tail"] --> B2
+    end
+
+    R0 --> R1 --> R2
+```
+
+CAS 失败不代表队列停止前进，恰恰说明另一个 Producer 已经成功链接了节点。失败者重新读取链表，必要时帮助推进 `tail`，再竞争下一个 `nil`。
+
+### 3.3 入队控制流程
 
 ```mermaid
 flowchart TD
@@ -274,7 +393,7 @@ flowchart TD
     Advance --> Done([返回])
 ```
 
-### 出队
+### 3.4 没有竞争时如何出队
 
 1. 读取 `head`、`tail` 和 `head.next`。
 2. `head.next == nil` 表示队列为空。
@@ -282,6 +401,111 @@ flowchart TD
 4. 使用 CAS 将 `head` 推进到 `next`；`next` 由此成为新的哨兵。
 
 成功修改 `head` 的 CAS 是出队的线性化点。
+
+假设队列包含 `A`、`B`，出队 `A` 时并不会删除 `A` 节点，而是把 `head` 从旧 dummy 推进到 `A`：
+
+```mermaid
+sequenceDiagram
+    participant C as Consumer
+    participant H as head
+    participant L as 链表
+
+    C->>H: Load，得到 dummy
+    C->>L: Load dummy.next，得到 A
+    C->>L: 读取 A.value
+    C->>H: CAS(dummy, A)
+    H-->>C: 成功，返回 A.value
+    Note over C,H: 出队线性化点；A 成为新 dummy
+```
+
+```mermaid
+flowchart LR
+    subgraph B0["出队前"]
+        H0["head"] --> D0["dummy"]
+        D0 --> A0["A"]
+        A0 --> B00["B"]
+        T0["tail"] --> B00
+    end
+
+    subgraph B1["head CAS 成功后"]
+        Old["旧 dummy<br/>等待 GC"] -.不再属于队列.-> A1
+        H1["head"] --> A1["A<br/>新 dummy"]
+        A1 --> B11["B<br/>下一个可出队元素"]
+        T1["tail"] --> B11
+    end
+
+    B0 --> B1
+```
+
+算法先读取 `A.value`，再竞争推进 `head`。只有 CAS 成功的 Consumer 才能返回这个值；CAS 失败者必须丢弃刚才读取的值并重试。
+
+### 3.5 两个 Consumer 同时出队
+
+假设 C1 和 C2 都读到了相同的 `head = dummy`、`next = A`：
+
+```mermaid
+sequenceDiagram
+    participant C1 as Consumer 1
+    participant H as head
+    participant C2 as Consumer 2
+
+    C1->>H: Load，得到 dummy；读取 A.value
+    C2->>H: Load，得到 dummy；读取 A.value
+    C1->>H: CAS(dummy, A)
+    H-->>C1: 成功，返回 A
+    Note over C1,H: A 的出队线性化点
+    C2->>H: CAS(dummy, A)
+    H-->>C2: 失败，不得返回 A
+    C2->>H: 重新读取，head 已是 A
+    C2->>H: CAS(A, B)
+    H-->>C2: 成功，返回 B
+```
+
+因此两个 Consumer 即使都提前读到了 `A.value`，也不可能都返回 `A`。推进 `head` 的 CAS 相当于对该元素的唯一认领操作。
+
+### 3.6 Producer 尚未推进 tail 时遇到 Consumer
+
+还有一种容易误判的中间状态：Producer 已把 `A` 链接到链表，但在推进 `tail` 之前被暂停。
+
+```mermaid
+flowchart LR
+    H["head"] --> D["dummy"]
+    T["tail<br/>暂时落后"] --> D
+    D --> A["A"]
+    A --> N["nil"]
+```
+
+此时 `head == tail`，但 `head.next != nil`，所以队列并不为空。Consumer 会帮助 Producer 推进 `tail`，然后重新读取并正常出队：
+
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant L as dummy.next
+    participant T as tail
+    participant C as Consumer
+    participant H as head
+
+    P->>L: CAS(nil, A) 成功
+    Note over P,L: A 已经入队
+    Note over P: 推进 tail 前被暂停
+    C->>H: Load，得到 dummy
+    C->>T: Load，也得到 dummy
+    C->>L: Load，得到 A
+    Note over C,L: head == tail，但 next != nil
+    C->>T: CAS(dummy, A)，帮助推进
+    C->>H: 重新读取后 CAS(dummy, A)
+    H-->>C: 成功，返回 A
+```
+
+这解释了为什么出队代码必须区分两种情况：
+
+| 观察结果 | 含义 | 动作 |
+| -------- | ---- | ---- |
+| `head.next == nil` | 链表中确实没有元素 | 返回空 |
+| `head == tail && head.next != nil` | `tail` 落后 | 帮助推进 `tail` 后重试 |
+| `head != tail && head.next != nil` | 存在可认领元素 | CAS 推进 `head` |
+
+### 3.7 出队控制流程
 
 ```mermaid
 flowchart TD
@@ -296,6 +520,26 @@ flowchart TD
     Lagging -- 否 --> Move{"CAS head -> head.next"}
     Move -- 失败 --> Load
     Move -- 成功 --> ReturnValue([返回 next.value])
+```
+
+### 3.8 竞态条件如何收敛
+
+Michael-Scott Queue 没有消除竞争，而是把竞争集中到少数原子状态转换上：
+
+| 竞态 | 唯一决定操作 | 失败者如何处理 |
+| ---- | ------------ | -------------- |
+| 多个 Producer 竞争同一个队尾空位 | `tail.next` 的 CAS | 重新读取，帮助推进 `tail`，再竞争下一个空位 |
+| 多个 Consumer 竞争同一个元素 | `head` 的 CAS | 丢弃提前读取的值，重新读取新的 `head` |
+| `tail` 落后于真实链表末尾 | 任意 Goroutine 推进 `tail` 的 CAS | 推进失败也无妨，说明别人已经推进 |
+| 读取期间 `head` 或 `tail` 改变 | 再次 Load 验证快照 | 放弃旧快照并重试 |
+
+可以把整个算法压缩成下面四句话：
+
+```text
+入队：竞争把队尾的 nil next 改成新节点。
+出队：竞争把 head 从旧哨兵推进到下一个节点。
+tail：允许落后，任何 Goroutine 都可以帮助推进。
+CAS 失败：说明别的 Goroutine 已经取得进展，重新观察即可。
 ```
 
 ### 为什么 Go 版本不手工回收节点
